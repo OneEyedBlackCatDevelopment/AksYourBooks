@@ -27,7 +27,7 @@ from langchain.prompts import PromptTemplate
 app = Flask(__name__)
 
 db_client_url = "http://localhost:8882"
-db_index_name = "agile"
+db_index_name = "eBooks"
 webserver_port = 8884
 
 ######################################################################################
@@ -52,7 +52,7 @@ def qna_prompt():
 def search_function(query):
     error_message = ""
     try:
-        results = mq.index(db_index_name).search(q=query, limit=15)
+        results = mq.index(db_index_name).search(q=query, limit=13)
         return results["hits"], ""
     except Exception as e:
         error_message = f"""<h4>Database Error: Could not connect to Marqo at <tt>'{db_client_url}'</tt> using index <tt>'{db_index_name}'</tt>.</h4>
@@ -151,11 +151,11 @@ def index():
 ######################################################################################
 if __name__ == '__main__':
     
-    # # Initialize Marqo Database client 
-    mq = marqo.Client(url=db_client_url)
+    
+    mq = marqo.Client(url=db_client_url) # Initialize Marqo Database client 
  
 
-    # ### Set OPENAI_API_KEY in OS environment variables
+    # ### Set OPENAI_API_KEY in OS environment variables ###
     
     #OpenAI_key = os.environ.get("OPENAI_API_KEY")
     OpenAI_key = "" #For some reason chat_gpt works without API key for now. This might change. 
@@ -165,7 +165,6 @@ if __name__ == '__main__':
         warnings.warn("You are using an empty string as OpenAI API key. This might not work.\n", UserWarning)
         
     
-    llm = OpenAI(temperature=0.9, openai_api_key=OpenAI_key)
+    llm = OpenAI(temperature=0.9, openai_api_key=OpenAI_key) #low temperature makes it less "creative"
 
-    
     app.run(debug=False, port=webserver_port)
