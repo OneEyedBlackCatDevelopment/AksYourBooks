@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<style>
+	body {
+	font-family: Arial, Helvetica, sans-serif;
+	}
+
+	h1{
+		  background: #aabbff;
+		  padding: 5px 5px;
+	}
+
+	table, th, td {
+	  border: 1px solid;
+	  border-color: #aabbff;
+	  text-align: left;
+	  padding: 5px;
+	  border-spacing: 5px;
+	}
+
+	td {
+	  vertical-align: top;
+	}
+
+	.searchfield {
+		border: 1px solid #aabbff;
+		padding: 5px;
+		width: 50%;
+		border-style: groove;
+	}
+
+	.resultcontext {
+		font-size: small;
+	}
+
+	.summary_disclaimer {
+		font-size: small;
+	}
+
+
+	footer {
+	  margin-top: 100px;
+	  text-align: right;
+	  font-size: small;
+	}
+	</style>
+
+
+    <title>Ask Your Books</title>
+</head>
+<body>
+	<h1>Ask Your Books</h1>
+	<form method="POST">
+		<input type="text" name="query" class="searchfield" placeholder="Enter your search query">
+		<button type="submit">Search</button>
+	</form>
+	<h2>
+		{{ query }}
+	</h2>
+	<p class="summary_disclaimer">
+		{{ summary_disclaimer | safe }}
+	</p>
+	<p>
+		{{ summarized_text }}
+	</p>
+
+	{% if error_message %}
+	{{ error_message | safe }}
+	{% endif %}
+
+	{% if results %}
+	<h2>Search Results:</h2>
+	<table>
+		<thead>
+			<tr>
+				<th>Results</th>
+				<th>Score</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for result in results %}
+
+			<tr>
+				<td>
+					<p class="resultcontext"><a target="{{ result.Link }}" href="{{ result.Link }}{{ result.text_marker }}">{{ result.Context }}</a></p>
+					<p class="resultdetails">{{ result._highlights[0].Details|safe }}</p>
+				</td>
+				<td>{{ result._score }}</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	{% endif %}
+
+
+
+	<footer>Powered by <a target="marqo" href="https://www.marqo.ai/">marqo.ai</a></footer>
+
+</body>
+</html>
