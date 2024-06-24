@@ -48,7 +48,6 @@
 	}
 	</style>
 
-
     <title>Ask Your Books</title>
 </head>
 <body>
@@ -76,14 +75,15 @@
 	<table>
 		<thead>
 			<tr>
+				<th>#</th>
 				<th>Results</th>
 				<th>Score</th>
 			</tr>
 		</thead>
 		<tbody>
 			{% for result in results %}
-
 			<tr>
+				<td>{{ loop.index }}</td>
 				<td>
 					<p class="resultcontext"><a target="{{ result.Link }}" href="{{ result.Link }}{{ result.text_marker }}">{{ result.Context }}</a></p>
 					<p class="resultdetails">{{ result._highlights[0].Details|safe }}</p>
@@ -94,8 +94,6 @@
 		</tbody>
 	</table>
 	{% endif %}
-
-
 
 	<footer>Powered by <a target="marqo" href="https://www.marqo.ai/">marqo.ai</a></footer>
 
