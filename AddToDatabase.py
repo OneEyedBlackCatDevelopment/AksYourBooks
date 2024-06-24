@@ -91,12 +91,23 @@ class AddToDatabaseUI:
 
     def load_metadata(self, file, path, script_dir):
         full_path = os.path.join(path, file)
+
+        # Get the relative path from the script_dir
+        relative_path = os.path.relpath(full_path, script_dir)
+
+        # If the relative path starts with "..", it means it's outside the script_dir
+        if relative_path.startswith(".."):
+            display_path = full_path
+        else:
+            display_path = relative_path
+
         doc = fitz.open(full_path)
         metadata = doc.metadata
         title = metadata.get("title", "")
         author = metadata.get("author", "")
         keywords = metadata.get("keywords", "")
-        self.tree.insert('', 'end', values=(file, author, title, keywords, full_path))
+    
+        self.tree.insert('', 'end', values=(file, author, title, keywords, display_path))
 
     def on_tree_select(self, event):
         pass  # No action needed for now
