@@ -37,7 +37,7 @@ def qna_prompt():
     """
 
     template = """Given the following extracted parts of a long document ("SOURCES") and a question ("QUESTION"), create a final answer one paragraph long. 
-    Don't try to make up an answer and use the text in the SOURCES only for the answer. Refere to the SOURCES in your answer.
+    Don't try to make up an answer and use the text in the "SOURCES" only for the answer. Refere to the "SOURCES" in your answer. If you enumerate them, start with 1. 
     If you don't know the answer, just say that you don't know. 
     QUESTION: {question}
     =========
@@ -151,6 +151,8 @@ def index():
 ######################################################################################
 if __name__ == '__main__':
     
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    os.chdir(script_dir)
     
     mq = marqo.Client(url=db_client_url) # Initialize Marqo Database client 
  
@@ -167,4 +169,4 @@ if __name__ == '__main__':
     
     llm = OpenAI(temperature=0.9, openai_api_key=OpenAI_key) #low temperature makes it less "creative"
 
-    app.run(debug=False, port=webserver_port)
+    app.run(host='0.0.0.0', debug=False, port=webserver_port)

@@ -193,6 +193,10 @@ class AddToDatabaseUI:
                 messagebox.showerror("Error", f"An error occurred: {e}")
 
 if __name__ == "__main__":
+    
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    os.chdir(script_dir) #change os dir to script dir, because files should be relative to script dir
+    
     root = tk.Tk()
     app = AddToDatabaseUI(root)
     root.mainloop()
