@@ -30,11 +30,11 @@ pip install PyMuPDF
 The serach function will work without this, but you won't get an AI summery of the results \
 https://platform.openai.com/account/api-keys
 
-## Create Environment Variable for OpenAi API Key \
+## Create Environment Variable for OpenAi API Key 
 https://platform.openai.com/account/api-keys 
-If you want to test your setup without connection to OpenAI, create the environment variable with a space as value
+\
+If you want to test your setup without connection to OpenAI, create the environment variable with a space as value \
 OPENAI_API_KEY
-
  
 ## Setup marqo.ai
 https://docs.marqo.ai/2.8
