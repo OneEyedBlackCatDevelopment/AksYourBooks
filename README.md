@@ -21,5 +21,11 @@ befor you click on "Install Now"
  
 ## Setup marqo.ai
 https://docs.marqo.ai/2.8
-
-
+\
+Open PowerShell and type the following command. This may take some time. \ 
+docker pull marqoai/marqo:latest
+\
+Then type: \
+docker run --name marqo -it -p 8882:8882 marqoai/marqo:latest
+\
+Now you should have a marqo container running on port 8882. This is how it looks in Docker Desktop:
