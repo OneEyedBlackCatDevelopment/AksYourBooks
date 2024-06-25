@@ -1,4 +1,6 @@
-This provides a webinterface as frontend and a marqo database and OpenAI ChatGPT as backend to ask your eBooks questions.
+# Ask Your Books
+This provides a webinterface as frontend and a marqo database and OpenAI ChatGPT as backend to ask your eBooks questions. \
+<img width="200" alt="image" src="https://github.com/OneEyedBlackCatDevelopment/AksYourBooks/assets/173571148/8eadc70b-138f-498e-857e-5ce43012bf30">
 
 # Usage
 ## Preperation
