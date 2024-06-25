@@ -1,5 +1,28 @@
 This provides a webinterface as frontend and a marqo database and OpenAI ChatGPT as backend to ask your eBooks questions.
 
+# Usage
+## Preperation
+### Start the webserver
+python .\AskYourBooks.py \
+\
+The webserver is now running on \
+http://localhost:8884/
+
+### Make your PDF ebooks avaliable 
+Copy your ebooks into the subdirectory static of the webserver script path. \
+You can create subfolders. \
+If you leave your PDFs in an other folder, you can still index them, but you might not be able to open them directy on the page of the search results.
+
+### Index your eBooks
+python .\AddToDatabase.py \
+\
+Select the folder "static". It should be a subdirectory next to AskYourBooks.py \
+It will list all the PDF files that are in "static" and its subdirectories. \
+\
+Click "Select All" and then "Add to Database"
+
+## Ask your books questions
+
 
 # Install
 
