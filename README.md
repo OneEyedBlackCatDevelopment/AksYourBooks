@@ -49,8 +49,8 @@ pip install flask \
 pip install openai \
 pip install langchain \
 pip install langchain_openai \
-pip install PyMuPDF
- 
+pip install PyMuPDF \
+pip install logger
 
 ## Create an API Key for OpenAI (ChatGPT)
 The serach function will work without this, but you won't get an AI summery of the results \
