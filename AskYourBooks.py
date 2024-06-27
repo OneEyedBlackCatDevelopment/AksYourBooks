@@ -1,4 +1,4 @@
-﻿######################################################################
+######################################################################
 # This is a web front end to a marqo.ai database and OpenAI backend
 #
 # usage: python AskYourBooks.py
@@ -7,10 +7,6 @@
 #
 ######################################################################
 
-
-
-
-#from ftplib import error_perm
 from flask import Flask, render_template, request # Webserver
 import marqo # Database
 import os # Operating System to get the API Key for ChatGPT
@@ -159,12 +155,12 @@ if __name__ == '__main__':
 
     # ### Set OPENAI_API_KEY in OS environment variables ###
     
-    #OpenAI_key = os.environ.get("OPENAI_API_KEY")
-    OpenAI_key = "" #For some reason chat_gpt works without API key for now. This might change. 
+    OpenAI_key = os.environ.get("OPENAI_API_KEY").strip()
     
     if( OpenAI_key == "" ):
-        print( "WARNING: You are using an empty string as OpenAI API key. This might not work.\n" )
-        warnings.warn("You are using an empty string as OpenAI API key. This might not work.\n", UserWarning)
+        warnings.warn("""
+        WARNING:You are using an empty string as OpenAI API key. This might not work.
+        """, UserWarning)
         
     
     llm = OpenAI(temperature=0.9, openai_api_key=OpenAI_key) #low temperature makes it less "creative"
