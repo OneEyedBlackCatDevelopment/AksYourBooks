@@ -47,3 +47,6 @@ static/frameworks/Kanban-Guide-2020-English.pdf
 static/frameworks/Kanban-Guide-2020-German.pdf
 *.vsidx
 static/ebooks/books.zip
+/static/ebooks/frameworks
+/static
+multi_language.txt

@@ -70,8 +70,9 @@ def create_ai_summary( texts, query ):
     
     if( texts ):
         try:
-            docs = [{"text": f"Source [{ind}]:" + t} for ind, t in enumerate(texts)]
+            docs = [{"text": f"Source [{ind+1}]:" + t} for ind, t in enumerate(texts)]
             prompt = qna_prompt().format(summaries='\n'.join([doc['text'] for doc in docs]), question=query)
+            #print( prompt )
             chain_qa = LLMChain(llm=llm, prompt=qna_prompt())
             llm_results = chain_qa.invoke({"summaries": docs, "question": query }, return_only_outputs=True)
             summarized_text = llm_results['text']
