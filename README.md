@@ -50,7 +50,8 @@ pip install openai \
 pip install langchain \
 pip install langchain_openai \
 pip install PyMuPDF \
-pip install logger
+pip install logger \
+pip install BeautifulSoup4
 
 ## Create an API Key for OpenAI (ChatGPT)
 The serach function will work without this, but you won't get an AI summery of the results \
