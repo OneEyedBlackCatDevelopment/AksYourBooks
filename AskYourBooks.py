@@ -7,17 +7,19 @@
 #
 ######################################################################
 
+from re import L
 from flask import Flask, render_template, request # Webserver
 import marqo # Database
 import os # Operating System to get the API Key for ChatGPT
 import warnings
 
-from langchain_openai import OpenAI
-from langchain.docstore.document import Document
-from langchain.chains import LLMChain
-from langchain.prompts import PromptTemplate
+#from langchain_openai import OpenAI
+#from langchain.docstore.document import Document
+#from langchain.chains import LLMChain
+#from langchain.prompts import PromptTemplate
 
-
+from openai import OpenAI
+from openai.resources.audio import translations
 
 
 app = Flask(__name__)
@@ -25,24 +27,46 @@ app = Flask(__name__)
 db_client_url = "http://localhost:8882"
 db_index_name = "eBooks"
 webserver_port = 8884
+llm_model = "gpt-4o"
 
 ######################################################################################
-def qna_prompt():
+def qna_prompt(summaries, question):
     """ 
-    prompt template for q and a type answering
+    Prompt template for Q and A type answering.
     """
 
     template = """Given the following extracted parts of a long document ("SOURCES") and a question ("QUESTION"), create a final answer one paragraph long. 
-    Don't try to make up an answer and use the text in the "SOURCES" only for the answer. Refere to the "SOURCES" in your answer. If you enumerate them, start with 1. 
-    If you don't know the answer, just say that you don't know. 
+    Don't try to make up an answer and use the text in the "SOURCES" only for the answer. Refer to the "SOURCES" in your answer. If you enumerate them, start with 1. 
+    If you don't know the answer, just say that you don't know. Allways reply in the languge of the "QUESTION".
     QUESTION: {question}
     =========
     SOURCES:
     {summaries}
     =========
     ANSWER:"""
-    PROMPT = PromptTemplate(template=template, input_variables=["summaries", "question"])
+    
+    # Using f-string to format the template with the given summaries and question
+    PROMPT = template.format(question=question, summaries=summaries)
+    
     return PROMPT
+
+
+######################################################################################
+def query_translation_prompt( query, languages):
+    """ 
+    prompt template for tranlating a query
+    """
+
+    template = """You will get a query in any languge and a given list of languages. 
+        Please reply only with the translation of the query in the given languages in the format <language>: <tranlation>
+
+        QUERY: {query}
+        LANGUAGES: {languages}"""
+        
+
+    PROMPT = template.format(query=query, languages=languages)
+    return PROMPT
+
 
 ######################################################################################
 def search_function(query):
@@ -71,11 +95,21 @@ def create_ai_summary( texts, query ):
     if( texts ):
         try:
             docs = [{"text": f"Source [{ind+1}]:" + t} for ind, t in enumerate(texts)]
-            prompt = qna_prompt().format(summaries='\n'.join([doc['text'] for doc in docs]), question=query)
-            #print( prompt )
-            chain_qa = LLMChain(llm=llm, prompt=qna_prompt())
-            llm_results = chain_qa.invoke({"summaries": docs, "question": query }, return_only_outputs=True)
-            summarized_text = llm_results['text']
+            prompt = qna_prompt( summaries='\n'.join([doc['text'] for doc in docs]), question=query)
+            
+            chat_completion = llm.chat.completions.create(
+                messages=[
+                    {
+                        "role": "user",
+                        "content": prompt,
+                    }
+                ],
+                model=llm_model,
+            )
+
+            summarized_text = chat_completion.choices[0].message.content
+            
+
         except Exception as e:
             error_message = f"""<h4>Something went wrong with the AI summary</h4>
             This is the error message:<br><tt>{e}</tt>"""
@@ -84,25 +118,77 @@ def create_ai_summary( texts, query ):
         error_message = "Nothing to summerize."    
     return summarized_text, error_message
 
+
+######################################################################################
+def translate_query(query, languages):
+    error_message = "" 
+    query_list = [query]
+    
+    if languages.strip() != "" and query.strip() != "":
+        try:
+            prompt = query_translation_prompt(query=query, languages=languages)
+            chat_completion = llm.chat.completions.create(
+                messages=[
+                    {
+                        "role": "user",
+                        "content": prompt,
+                    }
+                ],
+                model=llm_model,
+            )
+
+            answere = chat_completion.choices[0].message.content
+            
+            if answere: 
+                # Get the translated queries
+                lines = answere.splitlines()
+                query_list = [line.split(": ", 1)[1] for line in lines if ": " in line]
+
+            print("Splitted translations: ")
+            print(query_list)
+            
+        except Exception as e:
+            error_message = f"""<h4>Something went wrong with the AI translation</h4>
+            This is the error message:<br><tt>{e}</tt>"""
+            print(error_message)
+
+    return query_list, error_message
+
+
+
 ######################################################################################
 @app.route('/', methods=['GET', 'POST'])
 def index():
     results = []
+    query_list = []
     query=""
     error_message = ""
     summarized_text=""
     summary_disclaimer= ""
+    languages_input = ""
+    
     
     if request.method == 'POST':
         query = request.form['query']
-
+        languages_input = request.form['languages']
+        
         if query:
+                
+            query_list, error_message = translate_query( query, languages_input) 
+        
+            for q in query_list:
+                results_part, error_message = search_function(q)
+    
+                # Check if there is an error message
+                if error_message:
+                    print(f"Error: {error_message}")
+                else:
+                    results.extend(results_part)
 
-            results, error_message = search_function(query)
-       
+            results = sorted(results, key=lambda x: x['_score'], reverse=True)
 
-            if results:
-               
+
+            if results:      
                 texts = []
                 
                 try:
@@ -121,7 +207,6 @@ def index():
 
                 if(texts): #create AI sumary
                     summarized_text, error_message = create_ai_summary( texts=texts,query=query) # This costs money
-                    #summarized_text = "AI summery was deactivated because it costs money!"
                     if summarized_text != "":  # if an AI summery was created add an disclaimer
                         summary_disclaimer = "&#x26A0; This is an AI summary. It might not reflect the intention of the sources or may be just plain wrong. &#x26A0;"
         
@@ -141,6 +226,7 @@ def index():
                            query=query, 
                            summarized_text=summarized_text, 
                            summary_disclaimer=summary_disclaimer, 
+                           translations = query_list, 
                            error_message=error_message )
 
 
@@ -162,8 +248,10 @@ if __name__ == '__main__':
         warnings.warn("""
         WARNING:You are using an empty string as OpenAI API key. This might not work.
         """, UserWarning)
-        
     
-    llm = OpenAI(temperature=0.9, openai_api_key=OpenAI_key) #low temperature makes it less "creative"
+
+    llm = OpenAI( api_key=OpenAI_key ) 
+    
+    #llm = OpenAI(temperature=0.9, openai_api_key=OpenAI_key) #low temperature makes it less "creative"
 
     app.run(host='0.0.0.0', debug=False, port=webserver_port)
