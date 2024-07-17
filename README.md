@@ -1,6 +1,6 @@
 # Ask Your Books (in any language)
 This provides a webinterface as frontend and a marqo database and OpenAI ChatGPT as backend to ask your eBooks questions. \
-You can translate the question to the language of the sources and get a translated answer. \ 
+You can translate the question to the language of the sources and get a translated answer. \
 <img width="500" alt="image" src="https://github.com/OneEyedBlackCatDevelopment/AksYourBooks/assets/173571148/8eadc70b-138f-498e-857e-5ce43012bf30">
 
 # Usage
